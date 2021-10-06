@@ -11,6 +11,9 @@ const PORT = process.env.PORT || 5000
 connectDB();
 
 // use indicates, we are using a middleware
+// Below statement helps us to log our msgs to console
+app.use(express.json({extended: false}));
+
 // If the path matches 1st param, then go to routes/userApi file
 app.use("/api/users", require("./routes/userApi"));
 
