@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const { check, validationResult } = require("express-validator");
+const bcrypt = require("bcryptjs");
 
 const User = require("../models/User");
 
@@ -36,11 +37,15 @@ router.post("/",[
             user = new User({
                 name, email, password
             });
+
+            const salt = await bcrypt.genSalt(10); 
+            user.password = await bcrypt.hash(password, salt);
             user.save();
             res.send("User Route for posting");
         }
     } catch(error) {
         console.log(error);
+        res.status(500).send("Server Error");
     }
 });
 
