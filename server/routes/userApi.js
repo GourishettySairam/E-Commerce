@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
+const config = require("../config/keys");
 
 const { check, validationResult } = require("express-validator");
 const bcrypt = require("bcryptjs");
 
 const User = require("../models/User");
+
+const jwt = require("jsonwebtoken");
 
 router.get("/", (req, res) => {
     res.send("User Route");
@@ -41,7 +44,24 @@ router.post("/",[
             const salt = await bcrypt.genSalt(10); 
             user.password = await bcrypt.hash(password, salt);
             user.save();
-            res.send("User Route for posting");
+
+            const payload = {
+                user: {
+                    id: user.id,
+                }
+            };
+
+            // create a unique auth token for the user
+            jwt.sign(payload, config.jwtSecret, 
+                {expiresIn: 3600*24}, 
+                (err, token) => {
+                if(err) {
+                    throw err;
+                }
+                res.json({ token })
+            })
+
+            // res.send("User Route for posting");
         }
     } catch(error) {
         console.log(error);
