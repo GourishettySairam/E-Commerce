@@ -20,6 +20,7 @@ app.use("/api/users", require("./routes/userApi"));
 // If the path matches 1st param, then go to routes/productsApi file
 app.use("/api/products", require("./routes/productsApi"));
 
+app.use("/api/auth", require("./routes/authApi"));
 
 app.get("/", (req, res) => {
     res.send("My server is set up");
