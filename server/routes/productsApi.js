@@ -36,8 +36,27 @@ router.post("/", [auth, [
     }
 })
 
-router.get("/", (req, res) => {
-    res.send("Product Route");
+router.get("/", async (req, res) => {
+    try {
+        const products = await Product.find();
+        res.json(products);
+    } catch(error) {
+        console.log(error.message);
+        res.status(500).send("Server error");
+    }
+});
+
+router.get("/:id", async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+        if(!product) {
+            return res.status(404).json({msg: "Product not found"});
+        }
+        res.json(product);
+    } catch(error) {
+        console.log(error.message);
+        res.status(500).send("Server error");
+    }
 });
 
 module.exports = router;
