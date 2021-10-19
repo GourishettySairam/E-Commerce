@@ -8,7 +8,7 @@ router.post("/", [auth, [
     check("name", "Name is Required").not().isEmpty(),
     check("description", "description is Required").not().isEmpty(),
     check("category", "category is Required").not().isEmpty(),
-    check("Price", "Price is Required").not().isEmpty(),
+    check("price", "Price is Required").not().isEmpty(),
     check("quantity", "quantity is Required").not().isEmpty(),
 ]], async (req, res) => {
     const errors = validationResult(req);
@@ -17,7 +17,7 @@ router.post("/", [auth, [
     }
 
     try {
-        const { name, description, cateogory, price, quantity } = req.body;
+        const { name, description, category, price, brand, quantity } = req.body;
         const newProduct = Product({
             userId: req.user.id,
             name,
@@ -31,7 +31,7 @@ router.post("/", [auth, [
         const product = await newProduct.save();
         res.json({ product });
     } catch(error) {
-        console.error(error.message);
+        console.error(error);
         res.status(500).send("Server error");
     }
 })
