@@ -1,30 +1,51 @@
-import { SET_CURRENT_USER, SUCCESSFUL_REGISTER, FAILURE_REGISTER, ERRORS } from "./types";
+import { SET_CURRENT_USER, SUCCESSFUL_REGISTER, FAILURE_REGISTER, ERRORS, AUTH_ERROR } from "./types";
 import axios from "axios";
+import { setAuthToken } from "../util/setAuthToken";
+import { getServer } from "../util";
 
-export const setCurrentUser = (user) => {
-    return {
-        type: SET_CURRENT_USER,
-        payload: user
-    };
+// set a user
+export const setCurrentUser = (user) => async dispatch => {
+    if(localStorage.getItem("token")) {
+        setAuthToken(localStorage.getItem("token"));
+    }
+
+    try {
+        const res = await axios.get(`${getServer}/api/auth`);
+        dispatch({
+            type: SET_CURRENT_USER,
+            payload: res.data
+        })
+    } catch(err) {
+        dispatch({
+            type: AUTH_ERROR,
+        })
+    }
 };
 
-export const register = (userData) => dispatch =>  {
+// register a user
+export const register = (userData) => async (dispatch) =>  {
     const config = {
         headers: {
             "Content-type": "application/json"
         }
     }
     try {
-        const res = axios.post("localhost:5000/api/users", userData, config)
+        const res = await axios.post(`${getServer}/api/users`, userData, config)
         dispatch({
             type: SUCCESSFUL_REGISTER,
             payload: res.data
         });
     } catch(err) {
         const error = err.response.data.errors;
-        dispatch({
-            type: FAILURE_REGISTER,
-            payload: error
-        })
+        if(error) {
+            dispatch({
+                type: ERRORS,
+                payload: error
+            });
+        } else {
+            dispatch({
+                type: FAILURE_REGISTER
+            });
+        }
     }
 }
